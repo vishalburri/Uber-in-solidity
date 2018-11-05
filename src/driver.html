@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Pete's Pet Shop</title>
+    <title>UBER</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -21,41 +21,52 @@
     <div class="container">
       <div class="row">
         <div class="col-xs-12 col-sm-8 col-sm-push-2">
-          <h1 class="text-center">Pete's Pet Shop</h1>
+          <h1 class="text-center">UBER</h1>
           <hr/>
           <br/>
         </div>
       </div>
-
-      <div id="petsRow" class="row">
-        <!-- PETS LOAD HERE -->
+      <div id="loader">
+            <h2 class="text-center">Loading...</h2>
       </div>
+      <div id="updateride" class="row">
+        <div class="row">
+          <div class="form-group name1 col-md-6">
+              <label for="exampleInputEmail1" class="formText">Latitude</label>
+              <input type="text" class="form-control" id="driverlat" aria-describedby="emailHelp" name="muverName">
+          </div>
+      </div>
+      <div class="row">
+          <div class="form-group name1 col-md-6">
+              <label for="exampleInputEmail1" class="formText">Longitude</label>
+              <input type="text" class="form-control" id="driverlon" aria-describedby="emailHelp" name="muverName">
+          </div>
+      </div>
+      <div class="row">
+          <div class="form-group name1 col-md-6">
+              <label for="exampleInputEmail1" class="formText">Fare-per-km</label>
+              <input type="text" class="form-control" id="fare" aria-describedby="emailHelp" name="muverName">
+          </div>
+      </div>
+      <br>
+      <button id="button" onclick = "updateDriver();">Update</button>
+    </div>
+    <div id="requestdetails" class="row" style="display: none;">
+
+    </div>
+    <div id="accountAddr" class="row">
+          
     </div>
 
-    <div id="petTemplate" style="display: none;">
-      <div class="col-sm-6 col-md-4 col-lg-3">
-        <div class="panel panel-default panel-pet">
-          <div class="panel-heading">
-            <h3 class="panel-title">Scrappy</h3>
-          </div>
-          <div class="panel-body">
-            <img alt="140x140" data-src="holder.js/140x140" class="img-rounded img-center" style="width: 100%;" src="https://animalso.com/wp-content/uploads/2017/01/Golden-Retriever_6.jpg" data-holder-rendered="true">
-            <br/><br/>
-            <strong>Breed</strong>: <span class="pet-breed">Golden Retriever</span><br/>
-            <strong>Age</strong>: <span class="pet-age">3</span><br/>
-            <strong>Location</strong>: <span class="pet-location">Warren, MI</span><br/><br/>
-            <button class="btn btn-default btn-adopt" type="button" data-id="0">Adopt</button>
-          </div>
-        </div>
-      </div>
-    </div>
+  </div>
 
+    
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/web3.min.js"></script>
     <script src="js/truffle-contract.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/driver.js"></script>
   </body>
 </html>

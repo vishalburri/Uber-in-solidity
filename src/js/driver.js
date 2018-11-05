@@ -36,17 +36,16 @@ App = {
   render: function() {
     var uberInstance;
     var loader = $("#loader");  
-    var content = $("#searchride");
-    var ridedetails = $("#ridedetails")
+    var content = $("#updateride");
+    var ridedetails = $("#requestdetails")
     
-    loader.show();
-    content.hide();
+    loader.hide();
     ridedetails.hide();
     
     web3.eth.getCoinbase(function(err, account) {
       if (err === null) {
         App.account = account;
-        $("#accountAddress").html("Your Account: " + account);
+        $("#accountAddr").html("Your Account: " + account);
       }
     });
     App.contracts.Uber.deployed().then(function(instance) {
@@ -56,9 +55,11 @@ App = {
     // Load account data
   },
 
-  searchDriver : function(){
-    var ridedetails = $("#ridedetails")
-    var content = $("#searchride");
+  updateDriver : function(){
+    var requestdetails = $("#requestdetails")
+    var content = $("#updateride");
+    var loader = $("#loader");  
+
     content.hide();
     loader.show();
     

@@ -7,6 +7,7 @@ contract Uber {
   struct Driver {
     address driverAddr;
     address customerAddr;
+    string license;
     uint farePerKm;
     int latitude;
     int longitude;
@@ -29,15 +30,17 @@ contract Uber {
     regFee = _regFee;
   }
 
-  function registerDriver(uint _fareperkm,uint _phoneno) public payable {
+  function registerDriver(string _license,uint _phoneno) public payable {
       require (!driverList[mapDriver[msg.sender]].valid,"Not a valid address");
       require (msg.value >= regFee,"Insufficient Registration Fee");
             
       numDrivers = numDrivers + 1;
+      mapDriver[msg.sender] = numDrivers;
       driverList[numDrivers] = Driver({
         driverAddr : msg.sender,  
         customerAddr : address(0),
-        farePerKm : _fareperkm,
+        license : _license,
+        farePerKm : 0,
         latitude : 0,
         longitude : 0,
         phoneNo : _phoneno,
@@ -60,11 +63,13 @@ contract Uber {
       } 
       return id;
   }
-  function updateDriverLocation (int _latitude,int _longitude) public {
+  
+  function updateDriverDetails(uint _fareperkm,int _latitude,int _longitude) public {
     require (driverList[mapDriver[msg.sender]].valid,"Not a valid address");
 
     driverList[mapDriver[msg.sender]].latitude = _latitude;
     driverList[mapDriver[msg.sender]].longitude = _longitude;
+    driverList[mapDriver[msg.sender]].farePerKm = _fareperkm;
   }
   
 
