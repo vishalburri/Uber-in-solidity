@@ -5,7 +5,7 @@ contract Uber {
   address public owner;
   
   struct Driver {
-    address driverAddr;
+    string name;
     address customerAddr;
     string license;
     uint farePerKm;
@@ -15,8 +15,8 @@ contract Uber {
     bool valid;
   }
 
-  mapping(uint => Driver) public driverList;
-  mapping (address => uint) mapDriver;
+  mapping(uint => Driver)  driverList;
+  mapping (address => uint)  mapDriver;
   
   uint public numDrivers;
   uint public regFee;
@@ -30,14 +30,14 @@ contract Uber {
     regFee = _regFee;
   }
 
-  function registerDriver(string _license,uint _phoneno) public payable {
+  function registerDriver(string _name,string _license,uint _phoneno) public payable {
       require (!driverList[mapDriver[msg.sender]].valid,"Not a valid address");
       require (msg.value >= regFee,"Insufficient Registration Fee");
             
       numDrivers = numDrivers + 1;
       mapDriver[msg.sender] = numDrivers;
       driverList[numDrivers] = Driver({
-        driverAddr : msg.sender,  
+        name : _name,
         customerAddr : address(0),
         license : _license,
         farePerKm : 0,
@@ -46,6 +46,14 @@ contract Uber {
         phoneNo : _phoneno,
         valid  : true
       });
+  }
+  
+  function getDriverId (address _addr) public constant returns(uint res)  {
+    return mapDriver[_addr];
+  }
+  
+  function getDriverValid (uint _id) public constant returns(bool res)  {
+      return driverList[_id].valid;
   }
 
   function searchDrivers(int _latitude,int _longitude) public view returns(uint){

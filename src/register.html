@@ -29,7 +29,7 @@
       <div id="loader">
             <h2 class="text-center">Loading...</h2>
       </div>
-      <div id="updateride" class="row">
+      <div id="regdriver" class="row" style="display: none;">
         <div class="row">
           <div class="form-group name1 col-md-6">
               <label for="exampleInputEmail1" class="formText">Name</label>
@@ -49,10 +49,10 @@
           </div>
       </div>
       <br>
-      <button id="button" onclick = "registerDriver();">Register</button>
+      <button id="button" onclick = "App.regDriver();">Register</button>
     </div>
-    <div id="requestdetails" class="row" style="display: none;">
-
+    <div id="registered" class="row" style="display: none;">
+            <h2 class="text-center">You have successfully registered</h2>
     </div>
     <div id="accountAddr" class="row">
           
@@ -67,6 +67,6 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/web3.min.js"></script>
     <script src="js/truffle-contract.js"></script>
-    <script src="js/driver.js"></script>
+    <script src="js/register.js"></script>
   </body>
 </html>

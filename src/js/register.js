@@ -33,14 +33,15 @@ App = {
       return App.render();
     });
   },
-  render: function() {
+  render: async function() {
     var uberInstance;
     var loader = $("#loader");  
-    var content = $("#updateride");
-    var ridedetails = $("#requestdetails")
+    var content = $("#regdriver");
+    var registered = $("#registered")
     
-    loader.hide();
-    ridedetails.hide();
+    // loader.hide();
+    // content.show();
+    loader.show();
     
     web3.eth.getCoinbase(function(err, account) {
       if (err === null) {
@@ -48,24 +49,47 @@ App = {
         $("#accountAddr").html("Your Account: " + account);
       }
     });
-    App.contracts.Uber.deployed().then(function(instance) {
-        uberInstance = instance;
-    });
-
+    var uberInstance = await App.contracts.Uber.deployed(); 
+    try {
+    var driverId = await uberInstance.getDriverId(App.account);
+    var isValid = await uberInstance.getDriverValid(driverId);
+    if(!isValid){
+      loader.hide();
+      content.show();
+    }
+    else{
+      loader.hide();
+      content.hide();
+      registered.show();
+    }
+    }
+    catch(err){
+      alert('Connect to Metamask');
+    }
+    
     // Load account data
   },
 
-  updateDriver : function(){
-    var requestdetails = $("#requestdetails")
-    var content = $("#updateride");
-    var loader = $("#loader");  
-
-    content.hide();
-    loader.show();
+  regDriver : async function(){
     
-  },
-  
+    var loader = $("#loader");  
+    var content = $("#regdriver");
+    var registered = $("#registered");
+    var name = $("#drivername").val();
+    var phno = $("#phno").val();
+    var license = $("#license").val();
+    var uberInstance = await App.contracts.Uber.deployed();
 
+    try{
+      var fee = await uberInstance.regFee.call();
+      await uberInstance.registerDriver(name,license,phno,{from:App.account,value:fee});
+      content.hide();
+      registered.show();
+    }
+    catch(err){
+      alert("Insufficient Fee");  
+     }
+  },
   
 };
 
