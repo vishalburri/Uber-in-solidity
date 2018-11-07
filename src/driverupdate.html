@@ -27,14 +27,29 @@
         </div>
       </div>
       
-      
-    <div id="loader">
-            <h2 class="text-center">Loading...</h2>
-            <center><div class="loading"></div></center>
+      <div id="updateride" class="row" style="display: none;">
+        <div class="row">
+          <div class="form-group name1 col-md-6">
+              <label for="exampleInputEmail1" class="formText">Latitude</label>
+              <input type="text" class="form-control" id="driverlat" aria-describedby="emailHelp" name="muverName">
+          </div>
+      </div>
+      <div class="row">
+          <div class="form-group name1 col-md-6">
+              <label for="exampleInputEmail1" class="formText">Longitude</label>
+              <input type="text" class="form-control" id="driverlon" aria-describedby="emailHelp" name="muverName">
+          </div>
+      </div>
+      <div class="row">
+          <div class="form-group name1 col-md-6">
+              <label for="exampleInputEmail1" class="formText">Fare-per-km</label>
+              <input type="text" class="form-control" id="fare" aria-describedby="emailHelp" name="muverName">
+          </div>
+      </div>
+      <br>
+      <button id="button" onclick = "App.updateDriver();">Update</button>
     </div>
-    <div id="requestdetails" class="row" style="display: none;">
-
-    </div>
+    
     <div id="accountAddr" class="row">
           
     </div>
@@ -48,6 +63,6 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/web3.min.js"></script>
     <script src="js/truffle-contract.js"></script>
-    <script src="js/driver.js"></script>
+    <script src="js/driverupdate.js"></script>
   </body>
 </html>

@@ -35,6 +35,7 @@ App = {
   },
   render: async function() {
     var loader = $("#loader");  
+    var content = $("#updateride");
         
     web3.eth.getCoinbase(function(err, account) {
       if (err === null) {
@@ -46,32 +47,13 @@ App = {
     try {
       var driverId = await uberInstance.getDriverId(App.account);
       var isValid = await uberInstance.getDriverValid(driverId);
-      var reqDetails = $("#requestdetails");
       if(isValid){
         loader.hide();
-        //process here request list and show 
-        try{
-        var res = await uberInstance.getRequest({from:App.account});
-        var fare = await uberInstance.getDriverFare({from:App.account});
-        var cost = (Math.pow(res[2].toNumber()-res[0].toNumber(),2)+Math.pow(res[3].toNumber()-res[1].toNumber(),2))*fare.toNumber();
-
-        reqDetails.append("<center><h1>Ride Request</h1></center>");
-        reqDetails.append("<center><h4>Pickup-Latitude : "+res[0].toNumber()+"</h4></center>");
-        reqDetails.append("<center><h4>Pickup-Longitude : "+res[1].toNumber()+"</h4></center>");
-        reqDetails.append("<center><h4>Drop-Latitude : "+res[2].toNumber()+"</h4></center>");
-        reqDetails.append("<center><h4>Drop-Longitude : "+res[3].toNumber()+"</h4></center>");
-        reqDetails.append("<center><h4>Cost : "+cost+"</h4></center>");
-        reqDetails.append("<center><button type='button' class='btn btn-success' onclick='App.acceptRide();'>Accept</button></center>");
-        reqDetails.append("<center><button type='button' class='btn btn-danger'>Reject</button></center>");
-        reqDetails.show();
-        }
-        catch(err){
-        reqDetails.append("<h1>No Ride Request</h1>");
-        reqDetails.show();
-        }
+        content.show();
       }
       else{
         loader.show();
+        content.hide();
       }
     }
     catch(err){
@@ -79,18 +61,26 @@ App = {
     }
     // Load account data
   },
-  acceptRide: async function(){
+
+  updateDriver : async function(){
+    var content = $("#updateride");
+    var loader = $("#loader");  
+    var curlat = $("#driverlat").val();
+    var curlon = $("#driverlon").val();
+    var fareperkm = $("#fare").val();
+
+    // content.hide();
     var uberInstance = await App.contracts.Uber.deployed();
     try{
-    await uberInstance.acceptRequest({from:App.account});
-    console.log("fdg");
-    App.render();
-    //start trip and end trip
+    await uberInstance.updateDriverDetails(fareperkm,curlat,curlon,{from:App.account});
+    alert("Updated successfully");  
     }
     catch(err){
-      App.render();
+    alert("Invalid Values");  
     }
   },
+
+
   
 };
 
