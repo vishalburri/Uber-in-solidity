@@ -130,7 +130,6 @@ App = {
     else{
       //send request message to all driver id's
       ridedetails.append("<p>Sorry all drivers are busy right now.Please try again later.</p>");
-
       for(var i=0;i<id.length;i++){
         if(id[i]==0)
           break;
@@ -147,14 +146,12 @@ App = {
         var timerId = setInterval(async function(){
          // call your function here
          try{
-              // var isreject = await uberInstance.isRejected(id[i],{from:App.account});
-              // if(isreject){
-              //     clearInterval(timerId);
-              //     App.Booked=true;
-              //     uberInstance.removeRequest(id[i],{from:App.account});
-              //     console.log("rejected");
-              // }
-               var res = await uberInstance.getResponse(id[i],{from:App.account});
+              var isreject = await uberInstance.isRejected(id[i],{from:App.account});
+              if(isreject){
+                  clearInterval(timerId);
+                  console.log("rejected");
+              }
+              var res = await uberInstance.getResponse(id[i],{from:App.account});
               clearInterval(timerId);
               if(res){
                   loader.hide();
@@ -170,7 +167,6 @@ App = {
                 }
          }
          catch(err){
-            console.log(err.message);
             console.log("No response");
          }
         }, 500);
@@ -180,10 +176,10 @@ App = {
           console.log(App.Booked);
           if(App.Booked==false)
             uberInstance.removeRequest(id[i],{from:App.account});
-        },40000);
+        },20000);
 
         if(i!=id.length-1)
-          await delay(40000);
+          await delay(20000);
       }
 
       if(App.Booked==false){

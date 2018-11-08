@@ -151,6 +151,16 @@ contract Uber {
       return false;  
   }
 
+  function isRejected (uint id) public view returns(bool res)  {
+    require (!driverList[mapDriver[msg.sender]].valid,"Not a valid address");
+    
+    if(reqList[id].customerAddr==address(0))
+      return true;
+    else
+      return false;  
+  }
+  
+
   function removeRequest (uint id) public  {
     // require (driverList[id].customerAddr!=address(0),"Not accepted");
     require (!driverList[mapDriver[msg.sender]].valid,"Not a valid address");
