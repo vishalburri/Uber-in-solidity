@@ -70,6 +70,14 @@ contract Uber {
 
     return driverList[mapDriver[msg.sender]].farePerKm;
   }
+
+  function getDriverDetails (uint id) public view returns(string,uint,uint)  {
+    require (id >0 && id <=numDrivers,"Invalid id of driver");
+
+    return (driverList[id].name,driverList[id].farePerKm,driverList[id].phoneNo);
+  }
+  
+
   function getCustomer() public view returns(uint res)  {
     for(uint i=1;i<=numDrivers;i++){
       if(driverList[i].customerAddr==msg.sender){
@@ -78,6 +86,7 @@ contract Uber {
     }
     return 0;
   }
+
   
   function max(uint a, uint b) private pure returns (uint) {
         return a > b ? a : b;
@@ -133,6 +142,7 @@ contract Uber {
 
   function getResponse (uint id) public view returns(bool res)  {
     require (!driverList[mapDriver[msg.sender]].valid,"Not a valid address");
+    require (reqList[id].customerAddr!=address(0),"Rejected");
     require (driverList[id].customerAddr!=address(0),"Not accepted");
     
     if(driverList[id].customerAddr==msg.sender)
@@ -142,18 +152,10 @@ contract Uber {
   }
 
   function removeRequest (uint id) public  {
-    require (driverList[id].customerAddr!=address(0),"Not accepted");
+    // require (driverList[id].customerAddr!=address(0),"Not accepted");
     require (!driverList[mapDriver[msg.sender]].valid,"Not a valid address");
     
-    reqList[id] = Reqlist({
-        customerAddr : address(0),
-        fromLatitude : 0,
-        fromLongitude : 0,
-        toLatitude : 0,
-        toLongitude: 0
-      });
-
-    driverList[id].customerAddr = address(0);
+    reqList[id].customerAddr = address(0); 
   }
   
 
@@ -170,6 +172,12 @@ contract Uber {
     require (driverList[mapDriver[msg.sender]].customerAddr==address(0),"Cannot request while driving");
 
     driverList[mapDriver[msg.sender]].customerAddr = reqList[mapDriver[msg.sender]].customerAddr;
+  }
+  function rejectRequest() public {
+    require (driverList[mapDriver[msg.sender]].valid,"Not a valid address");
+    require (driverList[mapDriver[msg.sender]].customerAddr==address(0),"Cannot request while driving");
+
+    reqList[mapDriver[msg.sender]].customerAddr = address(0);
   }
 
   

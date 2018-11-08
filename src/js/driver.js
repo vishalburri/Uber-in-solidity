@@ -51,23 +51,25 @@ App = {
         loader.hide();
         //process here request list and show 
         try{
-        var res = await uberInstance.getRequest({from:App.account});
-        var fare = await uberInstance.getDriverFare({from:App.account});
-        var cost = (Math.pow(res[2].toNumber()-res[0].toNumber(),2)+Math.pow(res[3].toNumber()-res[1].toNumber(),2))*fare.toNumber();
+          var res = await uberInstance.getRequest({from:App.account});
+          var fare = await uberInstance.getDriverFare({from:App.account});
+          var cost = (Math.pow(res[2].toNumber()-res[0].toNumber(),2)+Math.pow(res[3].toNumber()-res[1].toNumber(),2))*fare.toNumber();
 
-        reqDetails.append("<center><h1>Ride Request</h1></center>");
-        reqDetails.append("<center><h4>Pickup-Latitude : "+res[0].toNumber()+"</h4></center>");
-        reqDetails.append("<center><h4>Pickup-Longitude : "+res[1].toNumber()+"</h4></center>");
-        reqDetails.append("<center><h4>Drop-Latitude : "+res[2].toNumber()+"</h4></center>");
-        reqDetails.append("<center><h4>Drop-Longitude : "+res[3].toNumber()+"</h4></center>");
-        reqDetails.append("<center><h4>Cost : "+cost+"</h4></center>");
-        reqDetails.append("<center><button type='button' class='btn btn-success' onclick='App.acceptRide();'>Accept</button></center>");
-        reqDetails.append("<center><button type='button' class='btn btn-danger'>Reject</button></center>");
-        reqDetails.show();
+          reqDetails.append("<center><h1>Ride Request</h1></center>");
+          reqDetails.append("<center><h4>Pickup-Latitude : "+res[0].toNumber()+"</h4></center>");
+          reqDetails.append("<center><h4>Pickup-Longitude : "+res[1].toNumber()+"</h4></center>");
+          reqDetails.append("<center><h4>Drop-Latitude : "+res[2].toNumber()+"</h4></center>");
+          reqDetails.append("<center><h4>Drop-Longitude : "+res[3].toNumber()+"</h4></center>");
+          reqDetails.append("<center><h4>Cost : "+cost+"</h4></center>");
+          reqDetails.append("<center><button type='button' class='btn btn-success' onclick='App.acceptRide();'>Accept</button></center>");
+          reqDetails.append("<center><button type='button' class='btn btn-danger' onclick='App.rejectRide();'>Reject</button></center>");
+          reqDetails.show();
         }
         catch(err){
-        reqDetails.append("<h1>No Ride Request</h1>");
-        reqDetails.show();
+          console.log(err.message);
+          reqDetails.empty();  
+          reqDetails.append("<h1>No Ride Requests</h1>");
+          reqDetails.show();
         }
       }
       else{
@@ -83,7 +85,6 @@ App = {
     var uberInstance = await App.contracts.Uber.deployed();
     try{
     await uberInstance.acceptRequest({from:App.account});
-    console.log("fdg");
     App.render();
     //start trip and end trip
     }
@@ -91,7 +92,17 @@ App = {
       App.render();
     }
   },
-  
+  rejectRide: async function(){
+    var uberInstance = await App.contracts.Uber.deployed();
+    try{
+    await uberInstance.rejectRequest({from:App.account});
+    App.render();
+    //start trip and end trip
+    }
+    catch(err){
+      App.render();
+    }
+  },
 };
 
 $(function() {

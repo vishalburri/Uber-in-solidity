@@ -2,7 +2,7 @@ App = {
   web3Provider: null,
   contracts: {},
   account: '0x0',
-
+  Booked : false,
   init: function() {
     return App.initWeb3();
   },
@@ -29,7 +29,6 @@ App = {
       App.contracts.Uber.setProvider(App.web3Provider);
 
       // App.listenForEvents();
-
       return App.render();
     });
   },
@@ -44,13 +43,29 @@ App = {
         $("#accountAddress").html("Your Account: " + account);
       }
     });
+
     var uberInstance = await App.contracts.Uber.deployed();
+     // uberInstance.removeRequest(1,{from:App.account});
+
     try {
       var driverId = await uberInstance.getDriverId(App.account);
       var isValid = await uberInstance.getDriverValid(driverId);
-      var custaddr = await uberInstance.getCustomer();
-      if(custaddr!=0){
-        ridedetails.append("<p>Assigned driver "+custaddr+"</p>")
+      var custaddr=0;
+      try{
+      custaddr = await uberInstance.getCustomer({from:App.account});
+      console.log(custaddr.toNumber());
+      }
+      catch(err){
+        console.log("dsfd");
+      }
+      if(custaddr.toNumber()!=0){
+        alert("Cab Booked");
+        loader.hide();
+        var driverDetails = await uberInstance.getDriverDetails(custaddr);
+        ridedetails.append("<center><div class='well well-sm'><h4>Driver Name : "+driverDetails[0]+"</h4></div></center>");
+        ridedetails.append("<center><div class='well well-sm'><h4>Contact No : "+driverDetails[2]+"</h4></div></center>");
+        ridedetails.append("<center><div class='well well-sm'><h4>Amount to Pay : "+driverDetails[1]*8+" wei</h4></div></center>");
+        ridedetails.append("<center><div class='well well-sm'><h4>Estimated Arrival : 30 min</h4></div></center>");
         ridedetails.show();
       }
       else if(!isValid){
@@ -113,7 +128,6 @@ App = {
       loader.append("<center><h2>Sorry No Cabs available now.Please try gain later</h2></center>");
     }
     else{
-      loader.hide();
       //send request message to all driver id's
       ridedetails.append("<p>Sorry all drivers are busy right now.Please try again later.</p>");
 
@@ -130,35 +144,53 @@ App = {
           continue;
         }
         //       wait for response from driver id[i]
-        var timerId = await setInterval(async function(){
+        var timerId = setInterval(async function(){
          // call your function here
          try{
-         let res = await uberInstance.getResponse(id[i],{from:App.account});
+              // var isreject = await uberInstance.isRejected(id[i],{from:App.account});
+              // if(isreject){
+              //     clearInterval(timerId);
+              //     App.Booked=true;
+              //     uberInstance.removeRequest(id[i],{from:App.account});
+              //     console.log("rejected");
+              // }
+               var res = await uberInstance.getResponse(id[i],{from:App.account});
               clearInterval(timerId);
-              if(result){
+              if(res){
+                  loader.hide();
+                  content.hide();
                   ridedetails.empty();
-                  ridedetails.append("<p>Assigned driver "+id[i]+"</p>");
-                  alert("Cab Booked");
+                  App.Booked=true;
+                  uberInstance.removeRequest(id[i],{from:App.account});
                   App.render();
                 }
                 else{
+                  uberInstance.removeRequest(id[i],{from:App.account});
                   console.log("False");
                 }
-              uberInstance.removeRequest(id[i],{from:App.account});
          }
          catch(err){
+            console.log(err.message);
             console.log("No response");
          }
         }, 500);
 
-        setTimeout(() => {clearInterval(timerId);},60000);
+        setTimeout(() => {
+          clearInterval(timerId);
+          console.log(App.Booked);
+          if(App.Booked==false)
+            uberInstance.removeRequest(id[i],{from:App.account});
+        },40000);
 
+        if(i!=id.length-1)
+          await delay(40000);
       }
 
-      //show driver details
-      await delay(id.length*60000);
-      alert("No cabs available");
-      ridedetails.show();
+      if(App.Booked==false){
+        loader.hide();
+        alert("No cabs available");
+        ridedetails.show();
+      }
     }
   },
   
