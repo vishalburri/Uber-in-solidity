@@ -62,7 +62,7 @@ App = {
           reqDetails.append("<center><h4>Drop-Latitude : "+res[2].toNumber()+"</h4></center>");
           reqDetails.append("<center><h4>Drop-Longitude : "+res[3].toNumber()+"</h4></center>");
           reqDetails.append("<center><h4>Cost : "+cost+"</h4></center>");
-          reqDetails.append("<center><button type='button' class='btn btn-success' onclick='App.acceptRide();'>Accept</button></center>");
+          reqDetails.append("<center><button type='button' class='btn btn-success' onclick='App.acceptRide("+cost+");'>Accept</button></center>");
           reqDetails.append("<center><button type='button' class='btn btn-danger' onclick='App.rejectRide();'>Reject</button></center>");
           reqDetails.show();
         }
@@ -90,10 +90,10 @@ App = {
     }
     // Load account data
   },
-  acceptRide: async function(){
+  acceptRide: async function(cost){
     var uberInstance = await App.contracts.Uber.deployed();
     try{
-    await uberInstance.acceptRequest({from:App.account});
+    await uberInstance.acceptRequest(cost,{from:App.account});
     App.render();
     //start trip and end trip
     }

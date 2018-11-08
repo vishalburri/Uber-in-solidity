@@ -58,15 +58,27 @@ App = {
       catch(err){
         console.log("dsfd");
       }
-      if(custaddr.toNumber()!=0){
+      var incomplete = await uberInstance.isIncompletePayment({from:App.account});
+      if(custaddr.toNumber()!=0 ){
         alert("Cab Booked");
         loader.hide();
         var driverDetails = await uberInstance.getDriverDetails(custaddr);
+        
         ridedetails.append("<center><div class='well well-sm'><h4>Driver Name : "+driverDetails[0]+"</h4></div></center>");
         ridedetails.append("<center><div class='well well-sm'><h4>Contact No : "+driverDetails[2]+"</h4></div></center>");
         ridedetails.append("<center><div class='well well-sm'><h4>Amount to Pay : "+driverDetails[1]*8+" wei</h4></div></center>");
         ridedetails.append("<center><div class='well well-sm'><h4>Estimated Arrival : 30 min</h4></div></center>");
+        ridedetails.append("<center><button type='button' class='btn btn-success' onclick='App.payDriver();'>Pay</button></center>");      
+                  
         ridedetails.show();
+      }
+      else if(incomplete){
+        loader.hide();
+        ridedetails.empty();
+        ridedetails.append("<center><h4>Complete your previous Payment</h4></div></center>");
+        ridedetails.append("<center><button type='button' class='btn btn-success' onclick='App.payDriver();'>Pay</button></center>");      
+                  
+        ridedetails.show(); 
       }
       else if(!isValid){
         loader.hide();
@@ -101,6 +113,22 @@ App = {
     else
       loader.append("<center><h2>Your estimated cost : "+estimatedcost+" wei</h2></center>");
     loader.show();
+  },
+
+  payDriver : async function(){
+    var ridedetails = $("#ridedetails");
+    var loader = $("#loader");  
+
+    var uberInstance = await App.contracts.Uber.deployed();
+    try{
+      await uberInstance.payDriver({from:App.account});
+      alert("Paid to Driver");
+      App.render();
+    }
+    catch(err){
+      console.log("err");
+      console.log(err);
+    }
   },
 
   searchDriver : async function(){

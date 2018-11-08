@@ -33,7 +33,8 @@ contract Uber {
   mapping (address => uint) mapDriver;
   mapping(uint => Reqlist) reqList;
   mapping (address => Customer) customer;
-  
+
+  event Collected(address sender,uint amount);
 
   uint public numDrivers;
   uint public regFee;
@@ -176,7 +177,14 @@ contract Uber {
     else
       return false;  
   }
-  
+
+  function isIncompletePayment() public view returns(bool res)  {
+    require (!driverList[mapDriver[msg.sender]].valid,"Not a valid address");
+    if(customer[msg.sender].amountToPay>0)
+      return true;
+    else
+      return false;      
+  }
 
   function removeRequest (uint id) public  {
     // require (driverList[id].customerAddr!=address(0),"Not accepted");
@@ -194,14 +202,16 @@ contract Uber {
     return (reqList[mapDriver[msg.sender]].fromLatitude,reqList[mapDriver[msg.sender]].fromLatitude,reqList[mapDriver[msg.sender]].toLatitude,reqList[mapDriver[msg.sender]].toLongitude);
   }
 
-  function acceptRequest() public {
+  function acceptRequest(uint cost) public {
     require (driverList[mapDriver[msg.sender]].valid,"Not a valid address");
     require (driverList[mapDriver[msg.sender]].customerAddr==address(0),"Cannot request while driving");
 
     driverList[mapDriver[msg.sender]].customerAddr = reqList[mapDriver[msg.sender]].customerAddr;
-    customer[msg.sender].driverAddr = msg.sender;
-    customer[msg.sender].isBusy = true; 
+    customer[reqList[mapDriver[msg.sender]].customerAddr].driverAddr = msg.sender;
+    customer[reqList[mapDriver[msg.sender]].customerAddr].isBusy = true; 
+    customer[reqList[mapDriver[msg.sender]].customerAddr].amountToPay = cost; 
   }
+
   function rejectRequest() public {
     require (driverList[mapDriver[msg.sender]].valid,"Not a valid address");
     require (driverList[mapDriver[msg.sender]].customerAddr==address(0),"Cannot request while driving");
@@ -220,9 +230,6 @@ contract Uber {
     driverList[mapDriver[msg.sender]].farePerKm = _fareperkm;
   }
   
-
-  
-  
   // function startTrip() {
   
   // }
@@ -230,9 +237,26 @@ contract Uber {
   function endTrip() public {
     require (driverList[mapDriver[msg.sender]].valid,"Not a valid address");
     require (driverList[mapDriver[msg.sender]].customerAddr!=address(0),"Cannot end now");
-
+    
     driverList[mapDriver[msg.sender]].customerAddr = address(0);
   }
+
+  function payDriver () public {
+    require (!driverList[mapDriver[msg.sender]].valid,"Not a valid address");
+    require (customer[msg.sender].driverAddr!=address(0),"Cannot pay");
+    
+    uint amount = customer[msg.sender].amountToPay; 
+    address driverAddr = customer[msg.sender].driverAddr;
+    customer[msg.sender].amountToPay = 0;
+    customer[msg.sender].driverAddr = address(0);
+    customer[msg.sender].isBusy = false; 
+    if(amount>0){
+    emit Collected(customer[msg.sender].driverAddr,amount);
+    driverAddr.transfer(amount);  
+    }
+    
+  }
+  
 
 
 }
