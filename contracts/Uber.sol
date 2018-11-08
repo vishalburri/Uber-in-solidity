@@ -22,10 +22,18 @@ contract Uber {
     int toLatitude;
     int toLongitude;
   }
+  //one struct for customer needed for payments and assigned driver(No location details)
+  struct Customer {
+    address driverAddr;
+    uint amountToPay;
+    bool isBusy;
+  }
   
   mapping(uint => Driver)  driverList;
   mapping (address => uint) mapDriver;
   mapping(uint => Reqlist) reqList;
+  mapping (address => Customer) customer;
+  
 
   uint public numDrivers;
   uint public regFee;
@@ -153,8 +161,17 @@ contract Uber {
 
   function isRejected (uint id) public view returns(bool res)  {
     require (!driverList[mapDriver[msg.sender]].valid,"Not a valid address");
-    
+
     if(reqList[id].customerAddr==address(0))
+      return true;
+    else
+      return false;  
+  }
+
+  function isAccepted() public view returns(bool res)  {
+    require (driverList[mapDriver[msg.sender]].valid,"Not a valid address");
+    
+    if(driverList[mapDriver[msg.sender]].customerAddr!=address(0))
       return true;
     else
       return false;  
@@ -182,6 +199,8 @@ contract Uber {
     require (driverList[mapDriver[msg.sender]].customerAddr==address(0),"Cannot request while driving");
 
     driverList[mapDriver[msg.sender]].customerAddr = reqList[mapDriver[msg.sender]].customerAddr;
+    customer[msg.sender].driverAddr = msg.sender;
+    customer[msg.sender].isBusy = true; 
   }
   function rejectRequest() public {
     require (driverList[mapDriver[msg.sender]].valid,"Not a valid address");
@@ -202,18 +221,18 @@ contract Uber {
   }
   
 
-  /*
-  Other functions which needs to be implemented
   
-  function startTrip() {
   
-  }
+  // function startTrip() {
   
-  function endTrip() {
+  // }
   
-  }
+  function endTrip() public {
+    require (driverList[mapDriver[msg.sender]].valid,"Not a valid address");
+    require (driverList[mapDriver[msg.sender]].customerAddr!=address(0),"Cannot end now");
 
-  */
+    driverList[mapDriver[msg.sender]].customerAddr = address(0);
+  }
 
 
 }

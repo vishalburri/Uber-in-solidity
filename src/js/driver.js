@@ -49,11 +49,12 @@ App = {
       var reqDetails = $("#requestdetails");
       if(isValid){
         loader.hide();
-        //process here request list and show 
+        //process here request list and show
+        var res,fare,cost; 
         try{
-          var res = await uberInstance.getRequest({from:App.account});
-          var fare = await uberInstance.getDriverFare({from:App.account});
-          var cost = (Math.pow(res[2].toNumber()-res[0].toNumber(),2)+Math.pow(res[3].toNumber()-res[1].toNumber(),2))*fare.toNumber();
+           res = await uberInstance.getRequest({from:App.account});
+           fare = await uberInstance.getDriverFare({from:App.account});
+           cost = (Math.pow(res[2].toNumber()-res[0].toNumber(),2)+Math.pow(res[3].toNumber()-res[1].toNumber(),2))*fare.toNumber();
 
           reqDetails.append("<center><h1>Ride Request</h1></center>");
           reqDetails.append("<center><h4>Pickup-Latitude : "+res[0].toNumber()+"</h4></center>");
@@ -68,8 +69,16 @@ App = {
         catch(err){
           console.log(err.message);
           reqDetails.empty();  
+          var isaccept = await uberInstance.isAccepted({from:App.account});
+          if(isaccept){
+          reqDetails.append("<center><h1>Current Ride</h1></center>");
+          reqDetails.append("<center><button type='button' class='btn btn-success' onclick='App.startTrip();'>Start Trip</button></center>");
+          reqDetails.show();
+          }
+          else{
           reqDetails.append("<h1>No Ride Requests</h1>");
           reqDetails.show();
+          }
         }
       }
       else{
@@ -97,6 +106,37 @@ App = {
     try{
     await uberInstance.rejectRequest({from:App.account});
     App.render();
+    //start trip and end Trip
+    }
+    catch(err){
+      App.render();
+    }
+  },
+  startTrip: async function(){
+    var reqDetails = $("#requestdetails");
+    var uberInstance = await App.contracts.Uber.deployed();
+    try{
+    // await uberInstance.startTrip({from:App.account});
+    reqDetails.empty();
+    reqDetails.append("<center><h1>Current Ride</h1></center>");
+    reqDetails.append("<center><button type='button' class='btn btn-success' onclick='App.endTrip();'>End Trip</button></center>");      
+    reqDetails.show();
+    // App.render();
+    //start trip and end trip
+    }
+    catch(err){
+      App.render();
+    }
+  },
+  endTrip: async function(){
+    var reqDetails = $("#requestdetails");
+    var uberInstance = await App.contracts.Uber.deployed();
+    try{
+    await uberInstance.endTrip({from:App.account});
+    reqDetails.empty();
+    reqDetails.append("<center><h1>Ride Finished.Collect amount</h1></center>");
+    reqDetails.show();
+    // App.render();
     //start trip and end trip
     }
     catch(err){
