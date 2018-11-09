@@ -59,6 +59,7 @@ App = {
         console.log("dsfd");
       }
       var incomplete = await uberInstance.isIncompletePayment({from:App.account});
+      console.log(incomplete);
       if(custaddr.toNumber()!=0 ){
         alert("Cab Booked");
         loader.hide();
@@ -120,10 +121,18 @@ App = {
     var loader = $("#loader");  
 
     var uberInstance = await App.contracts.Uber.deployed();
+    var payDetails = await uberInstance.getCustomerDetails({from:App.account});
     try{
-      await uberInstance.payDriver({from:App.account});
-      alert("Paid to Driver");
-      App.render();
+      console.log(payDetails[1].toNumber());
+      web3.eth.sendTransaction({to:payDetails[0],from:App.account,value:payDetails[1].toNumber()}, function(err, transactionHash){
+      if (!err){
+        uberInstance.payDriver({from:App.account});
+        console.log(transactionHash);
+        alert("Paid to Driver");
+        App.render();
+        }
+      });
+      // uberInstance.payDriver({from:App.account});
     }
     catch(err){
       console.log("err");

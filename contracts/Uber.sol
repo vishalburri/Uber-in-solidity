@@ -218,8 +218,13 @@ contract Uber {
 
     reqList[mapDriver[msg.sender]].customerAddr = address(0);
   }
-
-  
+  function getCustomerDetails() public view returns(address,uint)  {
+    require(customer[msg.sender].driverAddr!=address(0));      
+    require (!driverList[mapDriver[msg.sender]].valid,"Not a valid address");
+    
+    return (customer[msg.sender].driverAddr,customer[msg.sender].amountToPay);      
+  }
+      
   //setters
   
   function updateDriverDetails(uint _fareperkm,int _latitude,int _longitude) public {
@@ -245,15 +250,15 @@ contract Uber {
     require (!driverList[mapDriver[msg.sender]].valid,"Not a valid address");
     require (customer[msg.sender].driverAddr!=address(0),"Cannot pay");
     
-    uint amount = customer[msg.sender].amountToPay; 
-    address driverAddr = customer[msg.sender].driverAddr;
+    // uint amount = customer[msg.sender].amountToPay; 
+    // address driverAddr = customer[msg.sender].driverAddr;
     customer[msg.sender].amountToPay = 0;
     customer[msg.sender].driverAddr = address(0);
     customer[msg.sender].isBusy = false; 
-    if(amount>0){
-    emit Collected(customer[msg.sender].driverAddr,amount);
-    driverAddr.transfer(amount);  
-    }
+    // if(amount>0){
+    // emit Collected(customer[msg.sender].driverAddr,amount);
+    // driverAddr.transfer(amount);  
+    // }
     
   }
   

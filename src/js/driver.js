@@ -93,6 +93,7 @@ App = {
   acceptRide: async function(cost){
     var uberInstance = await App.contracts.Uber.deployed();
     try{
+    console.log(cost);  
     await uberInstance.acceptRequest(cost,{from:App.account});
     App.render();
     //start trip and end trip
